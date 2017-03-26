@@ -15,6 +15,6 @@ do
 			./pi ${nthr} ${chnk}
 			((x += 1))
 		done
-		echο -e "\n"
+		echo -e "\n"
 	done
 done
