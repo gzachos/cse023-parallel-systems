@@ -23,7 +23,8 @@ double		W = 1.0 / ((double) N), W2, pi = 0.0;
 int		chunksize, /* K */
 		taskid,    /* the next task id to execute */
 		ntasks;    /* total number of tasks */
-pthread_mutex_t	mut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t	resmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t	tskmut = PTHREAD_MUTEX_INITIALIZER;
 
 
 /* Function prototypes */
@@ -105,9 +106,9 @@ void taskexecute(int taskid)
 	for (i = taskid*chunksize; i < (taskid+1)*chunksize; i++)
 		tmp_sum += W / (1.0 + (0.5 + (double) i)*(0.5 + (double) i)*W2);
 
-	pthread_mutex_lock(&mut);
+	pthread_mutex_lock(&resmut);
 	pi += tmp_sum;
-	pthread_mutex_unlock(&mut);
+	pthread_mutex_unlock(&resmut);
 }
 
 
@@ -117,9 +118,9 @@ void *thrfunc(void *arg)
 
 	while (1)
 	{
-		pthread_mutex_lock(&mut);
+		pthread_mutex_lock(&tskmut);
 		t = taskid++;
-		pthread_mutex_unlock(&mut);
+		pthread_mutex_unlock(&tskmut);
 		if (t >= ntasks)
 			break;
 		taskexecute(t);
