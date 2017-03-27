@@ -19,4 +19,4 @@ set grid
 set yrange [0:]
 #set xrange [0.8:]
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
-plot ARG3 using 6:11 notitle with linespoints ls 1
+plot ARG3 using 2:3 notitle with linespoints ls 1
