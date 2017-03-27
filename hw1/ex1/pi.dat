@@ -1,0 +1,6 @@
+nthr = 1	chunk = 1	pi = 3.1415926536	time: 18.438119 sec.
+nthr = 1	chunk = 10	pi = 3.1415926536	time: 6.506109 sec.
+nthr = 1	chunk = 100	pi = 3.1415926536	time: 6.276107 sec.
+nthr = 1	chunk = 1000	pi = 3.1415926536	time: 6.249883 sec.
+nthr = 1	chunk = 10000	pi = 3.1415926536	time: 6.247652 sec.
+nthr = 1	chunk = 100000	pi = 3.1415926536	time: 6.233535 sec.
