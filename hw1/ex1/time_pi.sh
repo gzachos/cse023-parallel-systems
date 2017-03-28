@@ -4,19 +4,21 @@ NUM_THREADS="1 4 16"
 CHUNK_SIZE="1 10 100 1000 10000 100000"
 TMPFILE=`mktemp pi.XXXXXX`
 
-gcc -pthread pi_parallel.c --output pi
+gcc -pthread pi_parallel.c --output pi.out
 
-for nthr in ${NUM_THREADS}
+echo -e "START\n"
+
+for chnk in ${CHUNK_SIZE}
 do
-	for chnk in ${CHUNK_SIZE}
+	OUTFILE="pi_${chnk}.dat"
+	: > ${OUTFILE}
+	for nthr in ${NUM_THREADS}
 	do
 		x=0
-		OUTFILE="pi_${nthr}_${chnk}.dat"
-		: > ${OUTFILE}
 		: > ${TMPFILE}
 		while [ $x -lt 4 ]
 		do
-			./pi ${nthr} ${chnk} | tee -a ${TMPFILE}
+			./pi.out ${nthr} ${chnk} | tee -a ${TMPFILE}
 			((x += 1))
 		done
 		PI=`cat ${TMPFILE} | head -1 | awk '{print $9}'`
@@ -30,5 +32,10 @@ do
 		echo -e "${nthr}\t${chnk}\t`echo ${SUM}/4 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//'`" | tee -a ${OUTFILE}
 		echo -e "\n"
 	done
-	gnuplot -c pi.plt pi_${nthr}_${chnk}.png ${nthr} ${OUTFILE}
+#	gnuplot pi.plt pi_${chnk}.png ${chnk} ${OUTFILE}   # For gnuplot 4.6.6 and earlier.
+#	gnuplot -c pi.plt pi_${chnk}.png ${chnk} ${OUTFILE}
 done
+
+rm ${TMPFILE}
+
+echo -e "END\n"
