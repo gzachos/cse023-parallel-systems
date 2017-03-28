@@ -4,6 +4,7 @@
  * and dynamic scheduling.
  *
  * Developed by George Z. Zachos
+ * based on pi_serial.c by VVD.
  */
 
 #include <stdio.h>
@@ -23,8 +24,8 @@ double		W = 1.0 / ((double) N), W2, pi = 0.0;
 int		chunksize, /* K */
 		taskid,    /* the next task id to execute */
 		ntasks;    /* total number of tasks */
-pthread_mutex_t	resmut = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t	tskmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t	resmut = PTHREAD_MUTEX_INITIALIZER,
+		tskmut = PTHREAD_MUTEX_INITIALIZER;
 
 
 /* Function prototypes */
@@ -94,6 +95,8 @@ int main(int argc, char **argv)
 			(tv2.tv_usec - tv1.tv_usec)*1.0E-6;
 
 	printf("nthr = %d\tchunk = %d\tpi = %.10lf\ttime: %lf sec.\n", nthr, chunksize, pi, elapsed_time);
+
+	free(tid);
 	return 0;
 }
 
