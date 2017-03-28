@@ -185,17 +185,16 @@ threads and dynamic scheduling. During dynamic scheduling the parallelizable loo
 into chunks of iterations (tasks) and are dispatched to the threads available to the runtime
 system for execution. The dispatch takes place in respect to the current processor workload
 where the thread executes and as a result load balancing is achieved. In case chunk size is
-one ($1$) iteration, we refer to this technique as self-scheduling.
-
-The purpose of this exercise is to time the calculation of $\pi$ and observe how altering
-the number of threads and chunk size will affect execution time.
+one ($1$) iteration, we refer to this technique as self-scheduling. The purpose of this
+exercise is to time the calculation of $\pi$ and observe how altering the number of threads
+will affect execution time for a given chunk size.
 
 \subsection{Experiment details}
 
 The calculation consists of $5*10^8$ loop iterations, while thread number takes value in \{1, 4, 16\} and
-chunk size in \{1, 10, $10^2$, $10^3$, $10^4$ and $10^5$\}.
+chunk size in \{1, 10, $10^2$, $10^3$, $10^4$, $10^5$\}.
 
-\subsubsection{System}
+\subsubsection{System Specifications}
 The experiments were conducted on a Dell OptiPlex 7020:
 \begin{itemize}
  \item CPU: Intel\textregistered \ Core\texttrademark \ i5-4590 CPU @ 3.30GHz (64 bit)
@@ -381,8 +380,33 @@ In the following tables and plots the recorded execution times are displayed.
 
 %------------------------------------
 \pagebreak
+
 \subsection{Conclusion}
-blah blah
+Based on the results presented above and given that the average execution time of the serial
+program is 6,245896 seconds, we conclude that:
+
+\begin{itemize}
+ \item Program performance is increased until oversubscription appears. Even though we expect
+       overheads to be introduced due to time slicing (e.g. context switching, cache pollution),
+       the execution time becomes approximately constant after the number of threads exceeds
+       the number of the processors available (4). This happens because switching between
+       threads is less resource-intensive than switching between processes.
+ \item Self-scheduling leads to execution times multiple times greater than the one of the
+       serial program and in case of multithreaded calculation, dozens of times greater.
+       The chunk size of one (1) iteration is a fine-grained task something that results
+       in threads constantly racing to acquire the same mutex lock. As the number of threads
+       is increased, race overhead is increased too. Moreover, the granularity of self-scheduling
+       leads to more function calls taking place, something that adds up to the existing overheads.
+ \item A single thread executing tasks with chunk size $\geq$ 10 requires almost the same time
+       as the serial program.
+ \item Multiple threads and tasks with chunk size $\ll 10^2$ result in higher execution times
+       compared to the serial program. The reasons for these overheads are the same as in
+       self-scheduling (fine-grained parallelism).
+ \item Parallel program efficiency is unfolded for chunk size $\geq 10^2$ but hits a bottleneck
+       for more coarse-grained tasks (chunk size $\geq 10^4$ iterations in this case).
+\end{itemize}
+
+
 
 
 
