@@ -18,7 +18,7 @@
 /* Global declarations definitions
  * and initializations.
  */
-int A[N][N], B[N][N], C[N][N], chunk;
+int A[N][N], B[N][N], C[N][N], chunk, sthreads;
 
 typedef struct timeval timeval_t;
 typedef struct thrarg_s {
@@ -55,7 +55,9 @@ int main(int argc, char **argv)
                 exit(EXIT_FAILURE);
         }
 
-	chunk = N / nthr;
+	chunk    = N / nthr;
+	/* Special threads execute (chunk+1) iterations */
+	sthreads = (N % nthr != 0) ? N % nthr : 0;
 
 	/* Read matrices from files: "A_file", "B_file" 
 	 */
@@ -89,16 +91,6 @@ int main(int argc, char **argv)
 
 	printf("nthr = %d\ttime: %lf sec.\n", nthr, elapsed_time);
 
-#if 0
-
-	for (i = 0; i < N; i++)
-		for (j = 0; j < N; j++)
-		{
-			for (k = sum = 0; k < N; k++)
-				sum += A[i][k]*B[k][j];
-			C[i][j] = sum;
-		};
-#endif
 	/* Save result in "Cmat1024"
 	 */
 	writemat("Cmat1024", (int *) C, N);
@@ -113,8 +105,28 @@ void *thrfunc(void *arg)
 {
 	int i, j, k, sum;
         int tid = ((thrarg_t *) arg)->tid;
+	int lb, ub;
 
-	for (i = tid*chunk; i < (tid+1)*chunk; i++)
+	if (sthreads > 0)
+	{
+		if (tid < sthreads)
+		{
+			lb = tid * (chunk+1);
+			ub = lb + (chunk+1);
+		}
+		else
+		{
+			lb = sthreads*(chunk+1) + (tid-sthreads) * chunk;
+			ub = lb + chunk;
+		}
+	}
+	else
+	{
+		lb = tid * chunk;
+		ub = lb + chunk;
+	}
+
+	for (i = lb; i < ub; i++)
 		for (j = 0; j < N; j++)
 		{
 			for (k = sum = 0; k < N; k++)
