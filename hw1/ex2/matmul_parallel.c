@@ -15,9 +15,7 @@
 #define N 1024 /* Array dimension */
 
 
-/* Global declarations definitions
- * and initializations.
- */
+/* Global declarations and definitions */
 int A[N][N], B[N][N], C[N][N], chunk, sthreads;
 
 typedef struct timeval timeval_t;
@@ -42,25 +40,23 @@ int main(int argc, char **argv)
 	double     elapsed_time;
 
 	/* The number of threads is provided as a command line argument */
-        if (argc < 2)
-        {
-                fprintf(stderr, "Invalid number of command-line arguments!\n");
-                exit(EXIT_FAILURE);
-        }
+	if (argc < 2)
+	{
+		fprintf(stderr, "Invalid number of command-line arguments!\n");
+		exit(EXIT_FAILURE);
+	}
 
-        nthr = atoi(argv[1]);
+	nthr = atoi(argv[1]);
 	if (nthr < 1)
-        {
-                fprintf(stderr, "Invalid number of threads!\n");
-                exit(EXIT_FAILURE);
-        }
+	{
+		fprintf(stderr, "Invalid number of threads!\n");
+		exit(EXIT_FAILURE);
+	}
 
-	chunk    = N / nthr;
-	/* Special threads execute (chunk+1) iterations */
-	sthreads = (N % nthr != 0) ? N % nthr : 0;
+	chunk    = N / nthr; /* The # of iterations dispatched to one thread */
+	sthreads = N % nthr; /* Special threads execute (chunk+1) iterations */
 
-	/* Read matrices from files: "A_file", "B_file" 
-	 */
+	/* Read matrices from files: "A_file", "B_file" */
 	if (readmat("Amat1024", (int *) A, N) < 0) 
 		exit( 1 + printf("file problem\n") );
 	if (readmat("Bmat1024", (int *) B, N) < 0) 
@@ -68,44 +64,42 @@ int main(int argc, char **argv)
 
 	tid = (pthread_t *) malloc(nthr * sizeof(pthread_t));
 	arg = (thrarg_t *)  malloc(nthr * sizeof(thrarg_t));
-        if (!tid || !arg)
-        {
-                perror("malloc");
-                exit(errno);
-        }
+	if (!tid || !arg)
+	{
+		perror("malloc");
+		exit(errno);
+	}
 
 	/* Start timing */
-        gettimeofday(&tv1, NULL);
-        for (i = 0; i < nthr; i++)
+	gettimeofday(&tv1, NULL);
+	for (i = 0; i < nthr; i++)
 	{
 		(arg+i)->tid = i;
-                pthread_create(tid+i, NULL, thrfunc, ((void *)(arg+i)));
+		pthread_create(tid+i, NULL, thrfunc, ((void *)(arg+i)));
 	}
 	for (i = 0; i < nthr; i++)
-                pthread_join(tid[i], NULL);
-        /* End timing */
-        gettimeofday(&tv2, NULL);
+		pthread_join(tid[i], NULL);
+	/* End timing */
+	gettimeofday(&tv2, NULL);
 
 	elapsed_time =  (tv2.tv_sec - tv1.tv_sec) +
-                        (tv2.tv_usec - tv1.tv_usec)*1.0E-6;
+	                (tv2.tv_usec - tv1.tv_usec)*1.0E-6;
 
 	printf("nthr = %d\ttime: %lf sec.\n", nthr, elapsed_time);
 
-	/* Save result in "Cmat1024"
-	 */
+	/* Save result in "Cmat1024" */
 	writemat("Cmat1024", (int *) C, N);
 
 	free(tid);
 	free(arg);
-	return (0);
+	return (EXIT_SUCCESS);
 }
 
 
 void *thrfunc(void *arg)
 {
-	int i, j, k, sum;
-        int tid = ((thrarg_t *) arg)->tid;
-	int lb, ub;
+	int i, j, k, sum, lb, ub,
+	    tid = ((thrarg_t *) arg)->tid;
 
 	if (sthreads > 0)
 	{
@@ -116,7 +110,7 @@ void *thrfunc(void *arg)
 		}
 		else
 		{
-			lb = sthreads*(chunk+1) + (tid-sthreads) * chunk;
+			lb = sthreads*(chunk+1) + (tid-sthreads)*chunk;
 			ub = lb + chunk;
 		}
 	}
@@ -160,7 +154,7 @@ int readmat(char *fname, int *mat, int n)
 				return (-1); 
 			};
 	fclose(fp);
-	return (0);
+	return (EXIT_SUCCESS);
 }
 
 
@@ -175,5 +169,5 @@ int writemat(char *fname, int *mat, int n)
 		for (j = 0; j < n; j++)
 			fprintf(fp, " %d", _mat(i, j));
 	fclose(fp);
-	return (0);
+	return (EXIT_SUCCESS);
 }

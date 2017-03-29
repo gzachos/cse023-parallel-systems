@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 	printf("nthr = %d\tchunk = %d\tpi = %.10lf\ttime: %lf sec.\n", nthr, chunksize, pi, elapsed_time);
 
 	free(tid);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 
