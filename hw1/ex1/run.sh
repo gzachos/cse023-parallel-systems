@@ -34,10 +34,11 @@ do
 		echo -e "${nthr}\t${chnk}\t`echo ${SUM}/4 | bc -l | sed '/\./ s/\.\{0,1\}0\{1,\}$//'`" >> ${OUTFILE}
 		echo -e "\n"
 	done
-#	gnuplot pi.plt pi_${chnk}.png ${chnk} ${OUTFILE}   # For gnuplot 4.6.6 and earlier.
-#	gnuplot -c pi.plt pi_${chnk}.png ${chnk} ${OUTFILE}
+	# Unsupported by gnuplot 4.6.6 and earlier.
+	# gnuplot -c pi.plt pi_${chnk}.png ${chnk} ${OUTFILE}
 done
 
 rm ${TMPFILE} ${EXEFILE}
 
 echo "END"
+

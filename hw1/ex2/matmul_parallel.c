@@ -25,7 +25,7 @@ typedef struct thrarg_s {
 
 
 /* Function prototypes */
-int   readmat(char *fname, int *mat, int n), 
+int   readmat(char *fname, int *mat, int n),
       writemat(char *fname, int *mat, int n);
 void *thrfunc(void *arg);
 
@@ -57,9 +57,9 @@ int main(int argc, char **argv)
 	sthreads = N % nthr; /* Special threads execute (chunk+1) iterations */
 
 	/* Read matrices from files: "A_file", "B_file" */
-	if (readmat("Amat1024", (int *) A, N) < 0) 
+	if (readmat("Amat1024", (int *) A, N) < 0)
 		exit( 1 + printf("file problem\n") );
-	if (readmat("Bmat1024", (int *) B, N) < 0) 
+	if (readmat("Bmat1024", (int *) B, N) < 0)
 		exit( 1 + printf("file problem\n") );
 
 	tid = (pthread_t *) malloc(nthr * sizeof(pthread_t));
@@ -143,7 +143,7 @@ int readmat(char *fname, int *mat, int n)
 {
 	FILE *fp;
 	int  i, j;
-	
+
 	if ((fp = fopen(fname, "r")) == NULL)
 		return (-1);
 	for (i = 0; i < n; i++)
@@ -151,7 +151,7 @@ int readmat(char *fname, int *mat, int n)
 			if (fscanf(fp, "%d", &_mat(i,j)) == EOF)
 			{
 				fclose(fp);
-				return (-1); 
+				return (-1);
 			};
 	fclose(fp);
 	return (EXIT_SUCCESS);
@@ -162,7 +162,7 @@ int writemat(char *fname, int *mat, int n)
 {
 	FILE *fp;
 	int  i, j;
-	
+
 	if ((fp = fopen(fname, "w")) == NULL)
 		return (-1);
 	for (i = 0; i < n; i++, fprintf(fp, "\n"))
