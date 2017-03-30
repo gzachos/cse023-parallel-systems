@@ -13,7 +13,7 @@ set logscale x 2
 # set logscale y2 2 
 set style line 1 lc rgb '#dd181f' lt 1 lw 1 pt 5 pi -1 ps 1
 set title "Pi calculation using dynamic scheduling\n(Chunk size = ".ARG2.")"
-set xlabel "Number of threads"
+set xlabel "Threads"
 set ylabel "Time (sec)"
 set y2tics
 set grid

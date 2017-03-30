@@ -38,6 +38,7 @@
 \usepackage{graphicx} % Required to insert images
 \usepackage{listings} % Required for insertion of code
 \usepackage{courier} % Required for the courier font
+
 % Margins
 \topmargin=-0.45in
 \evensidemargin=0in
@@ -156,7 +157,7 @@
 }
 
 \author{\textbf{\hmwkAuthorName}}
-\date{March 28, 2017} % Insert date here if you want it to appear below your name
+\date{March 30, 2017} % Insert date here if you want it to appear below your name
 
 %----------------------------------------------------------------------------------------
 
@@ -174,23 +175,26 @@
 \tableofcontents
 \newpage
 
-%----------------------------------------------------------------------------------------
-%	Exercise #1
-%----------------------------------------------------------------------------------------
+
+%+----------------------------------------------------------+
+%|                                                          |
+%|          EXERCISE #1                                     |
+%|                                                          |
+%+----------------------------------------------------------+
 
 \section{Exercise \#1}
+
 \subsection{About}
 This exercise is about the calculation of the mathematical constant $\pi$ using \texttt{POSIX}
 threads and dynamic scheduling. During dynamic scheduling the parallelizable loops are divided
 into chunks of iterations (tasks) and are dispatched to the threads available to the runtime
 system for execution. The dispatch takes place in respect to the current processor workload
-where the thread executes and as a result load balancing is achieved. In case chunk size is
+where each thread executes and as a result load balancing is achieved. In case chunk size is
 one ($1$) iteration, we refer to this technique as self-scheduling. The purpose of this
 exercise is to time the calculation of $\pi$ and observe how altering the number of threads
 will affect execution time for a given chunk size.
 
 \subsection{Experiment details}
-
 The calculation consists of $5*10^8$ loop iterations, while thread number takes value in \{1, 4, 16\} and
 chunk size in \{1, 10, $10^2$, $10^3$, $10^4$, $10^5$\}.
 
@@ -216,8 +220,9 @@ The experiments were conducted on a Dell OptiPlex 7020:
 \pagebreak
 
 \subsection{Timing Results}
-
 In the following tables and plots the recorded execution times are displayed.
+Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
+$Y$ axis on a \underline{linear} scale.
 
 %------------------------------------ 1
 
@@ -227,7 +232,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     1 & 1 & 18.451202 & 18.443870 & 18.444319 & 18.441278 & 18.44516725 \\ 
     \hline
@@ -254,7 +259,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     10 & 1 & 6.505206 & 6.510850 & 6.507051 & 6.511070 & 6.50854425 \\
     \hline
@@ -280,7 +285,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     100 & 1 & 6.275921 & 6.279012 & 7.893470 & 6.281098 & 6.68237525 \\
     \hline
@@ -306,7 +311,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     1000 & 1 & 6.248489 & 6.254362 & 6.254913 & 6.251492 & 6.252314 \\
     \hline
@@ -333,7 +338,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     10000 & 1 & 6.244337 & 6.252478 & 6.250002 & 6.252064 & 6.24972025 \\
     \hline
@@ -360,7 +365,7 @@ In the following tables and plots the recorded execution times are displayed.
     \hline
     \multicolumn{7}{|c|}{Timing results of $\pi$ calculation (Time unit: seconds)} \\
     \hline
-    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4thr run & Average time\\ [0.5ex] 
+    Chunk Size & \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
     \hline\hline
     100000 & 1 & 6.237799 & 6.234975 & 6.244593 & 6.235083 & 6.2381125 \\
     \hline
@@ -407,7 +412,101 @@ program is 6,245896 seconds, we conclude that:
 \end{itemize}
 
 
+%+----------------------------------------------------------+
+%|                                                          |
+%|          EXERCISE #2                                     |
+%|                                                          |
+%+----------------------------------------------------------+
+
+\section{Exercise \#2}
+
+\subsection{About}
+This exercise is about the multiplication of integer $N$x$N$ arrays using \texttt{POSIX} threads
+and static scheduling. During static scheduling the parallelizable loops are evenly (when
+possible) divided into chunks of iterations (tasks) and are dispatched to the threads available
+to the runtime system for execution. Due to this even distribution of iterations and in contrast
+to dynamic scheduling, a thread executing on a processor under heavy workload will increase the
+total execution time. The purpose of this exercise is to parallelize only the \underline{outermost}
+for-loop of the serial calculation, time the matrix multiplication and observe how altering the
+number of threads will affect execution time.
+
+\subsection{Implementation details}
+If $T$ is the number of threads, and $N$ is the array dimension, then the outermost
+for-loop of the serial program consists of $N$ iterations, that should be divided
+into $T$ chunks. When $T$ divides $N$ evenly, the exact chunk size is $N/T$. In the
+opposite case, $S=N \bmod T$ threads will be assigned $\lfloor{N/T}\rfloor+1$ iterations
+and $T-S$ threads will be assigned $\lfloor{N/T}\rfloor$ iterations. We are going
+to refer to $S$ as the number of special threads because these threads execute one
+more iteration than the rest. This policy manages to avoid a lopsided distribution
+of iterations to threads as it increases workload by only a single iteration
+\footnote{This additional iteration may add significant delays in coarse-grained
+tasks}.
+
+\newpage
+
+\subsection{Experiment details}
+During this experiment, thread number takes value in \{1, 2, 4, 8, 12, 16\} and array
+size is 1024x1024.
+
+\subsubsection{System Specifications}
+The experiments were conducted once again on a Dell OptiPlex 7020.
 
 
+\subsection{Timing Results}
+In the following table and plot the recorded execution times are displayed.
+Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
+$Y$ axis on a \underline{linear} scale.
+
+%------------------------------------ 1
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{|c||l|l|l|l||l|} 
+    \hline
+    \multicolumn{6}{|c|}{Timing results of matrix multiplication (Time unit: seconds)} \\
+    \multicolumn{6}{|c|}{Array size: 1024x1024} \\
+    \hline
+   \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
+    \hline\hline
+    1 & 5.057095 & 4.319662 & 3.157559 & 5.297035 & 4.45783775 \\ 
+    \hline
+    2 & 2.648351 & 2.545161 & 1.940197 & 2.043663 & 2.294343 \\
+    \hline
+    4 & 0.918773 & 0.800195 & 1.504583 & 1.504583 & 1.07884625 \\
+    \hline
+    8 & 0.971947 & 1.428921 & 1.224236 & 0.990774 & 1.1539695 \\
+    \hline
+    12 & 0.965793 & 0.986273 & 0.981548 & 1.130868 & 1.0161205 \\
+    \hline
+    16 & 1.208460 & 1.241845 & 1.015431 & 0.974093 & 1.10995725 \\ [1ex]
+    \hline
+    \end{tabular}
+  \caption{Timing results of 2D matrix multiplication}
+\end{table}
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.55\columnwidth]{../ex2/plots/matmul.png}
+  \caption{Timing results of 2D matrix multiplication}
+\end{figure}
+
+%------------------------------------
+\pagebreak
+
+\subsection{Conclusion}
+Based on the results presented above and given that the average execution time of the serial
+program is 4,297561 seconds, we conclude that:
+
+\begin{itemize}
+ \item Program performance is approximately doubled as the number of threads is increased, until
+       oversubscription bottleneck is hit and execution time becomes almost constant
+       \footnote{This is also the conclusion we came to on Exercise \#1}.
+ \item Execution time of the parallel program when a single thread is used to perform the
+       calculation is a bit higher than the time of the serial program. Moreover, we observed
+       that execution time in general varies from time to time. Several reasons such as context
+       switching, thread affinity, cache misses \& cache pollution justify the existence of
+       these overheads and consequently this behavior.
+\end{itemize}
 
 \end{document}

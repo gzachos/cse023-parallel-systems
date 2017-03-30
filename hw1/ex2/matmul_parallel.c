@@ -16,7 +16,7 @@
 
 
 /* Global declarations and definitions */
-int A[N][N], B[N][N], C[N][N], chunk, sthreads;
+int A[N][N], B[N][N], C[N][N], chunksize, sthreads;
 
 typedef struct timeval timeval_t;
 typedef struct thrarg_s {
@@ -53,8 +53,12 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	chunk    = N / nthr; /* The # of iterations dispatched to one thread */
-	sthreads = N % nthr; /* Special threads execute (chunk+1) iterations */
+	chunksize = N / nthr; /* The # of iterations dispatched
+	                       * to one thread
+	                       */
+	sthreads  = N % nthr; /* Special threads execute
+	                       * (chunksize+1) iterations
+	                       */
 
 	/* Read matrices from files: "A_file", "B_file" */
 	if (readmat("Amat1024", (int *) A, N) < 0)
@@ -105,19 +109,19 @@ void *thrfunc(void *arg)
 	{
 		if (tid < sthreads)
 		{
-			lb = tid * (chunk+1);
-			ub = lb + (chunk+1);
+			lb = tid * (chunksize+1);
+			ub = lb + (chunksize+1);
 		}
 		else
 		{
-			lb = sthreads*(chunk+1) + (tid-sthreads)*chunk;
-			ub = lb + chunk;
+			lb = sthreads*(chunksize+1) + (tid-sthreads)*chunksize;
+			ub = lb + chunksize;
 		}
 	}
 	else
 	{
-		lb = tid * chunk;
-		ub = lb + chunk;
+		lb = tid * chunksize;
+		ub = lb + chunksize;
 	}
 
 	for (i = lb; i < ub; i++)
