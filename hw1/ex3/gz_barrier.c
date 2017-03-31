@@ -1,7 +1,7 @@
 /* gz_barrier.c
  * ------------
  * Custom barrier implementation
- * 
+ *
  * Developed by George Z. Zachos
  */
 
@@ -11,91 +11,92 @@
 #include "gz_barrier.h"
 
 
-int barrier_init(barrier_t *b, int nthr)
+int barrier_init(barrier_t *barrier, unsigned int count)
 {
-	int retval;
-
-	if (nthr < 0 || !b)
+	if (!barrier || count == 0)
 		return EINVAL;
-	if (b->mutex)
-		if ((retval = pthread_mutex_init(b->mutex, NULL)) == EBUSY)
+	if (barrier->mutex)
+		if (pthread_mutex_init(barrier->mutex, NULL) == EBUSY)
 			return EBUSY;
-	b->nthr = b->n = b->spin = nthr;
+	barrier->init_count = barrier->left = barrier->curr_count = count;
 
-	b->release_threads = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-	if (!b->release_threads)
+	barrier->release_threads = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
+	if (!barrier->release_threads)
 	{
 		perror("malloc");
 		return errno; /* =ENOMEM */
 	}
 
-	b->next_wait = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-	if (!b->next_wait)
+	barrier->next_bar = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
+	if (!barrier->next_bar)
 	{
-		free(b->release_threads);
+		free(barrier->release_threads);
 		perror("malloc");
 		return errno; /* =ENOMEM */
 	}
 
-	b->mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-	if (!b->mutex)
+	barrier->mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+	if (!barrier->mutex)
 	{
-		free(b->release_threads);
-		free(b->next_wait);
+		free(barrier->release_threads);
+		free(barrier->next_bar);
 		perror("malloc");
 		return errno; /* =ENOMEM */
 	}
 
-	pthread_cond_init(b->release_threads, NULL);
-	pthread_cond_init(b->next_wait, NULL);
-	pthread_mutex_init(b->mutex, NULL);
+	pthread_cond_init(barrier->release_threads, NULL);
+	pthread_cond_init(barrier->next_bar, NULL);
+	pthread_mutex_init(barrier->mutex, NULL);
 
 	return EXIT_SUCCESS;
 }
 
 
-int barrier_wait(barrier_t *b)
+int barrier_wait(barrier_t *barrier)
 {
-	if (!b)
+	if (!barrier)
 		return EINVAL;
-/*	if (pthread_mutex_init(b->mutex, NULL) != EBUSY)
-		return EINVAL;
-*/
-	pthread_mutex_lock(b->mutex);
-	while (b->spin != b->nthr)
-		pthread_cond_wait(b->next_wait, b->mutex);
-	(b->n)--;
-	while (b->n != 0)
-		pthread_cond_wait(b->release_threads, b->mutex);
-	(b->spin)--;
-	if (b->spin == b->nthr-1)
-		pthread_cond_broadcast(b->release_threads);
-	if (b->spin == 0)
+
+	pthread_mutex_lock(barrier->mutex);
+	while (barrier->curr_count != barrier->init_count)
+		pthread_cond_wait(barrier->next_bar, barrier->mutex);
+	(barrier->left)--;
+	while (barrier->left != 0)
+		pthread_cond_wait(barrier->release_threads, barrier->mutex);
+	(barrier->curr_count)--;
+	if (barrier->curr_count == barrier->init_count-1)
 	{
-		b->n = b->spin = b->nthr;
-		pthread_cond_broadcast(b->next_wait);
+		pthread_cond_broadcast(barrier->release_threads);
+		pthread_mutex_unlock(barrier->mutex);
+		return PTHREAD_BARRIER_SERIAL_THREAD;
 	}
-	pthread_mutex_unlock(b->mutex);
+	if (barrier->curr_count == 0)
+	{
+		barrier->left = barrier->curr_count = barrier->init_count;
+		pthread_cond_broadcast(barrier->next_bar);
+	}
+	pthread_mutex_unlock(barrier->mutex);
 
 	return EXIT_SUCCESS;
 }
 
 
-int barrier_destroy(barrier_t *b)
+int barrier_destroy(barrier_t *barrier)
 {
-	if (!b)
-		return EINVAL;
-	if (pthread_mutex_init(b->mutex, NULL) != EBUSY)
+	if (!barrier)
 		return EINVAL;
 
-	pthread_mutex_lock(b->mutex);
-	if (b->n != b->nthr)
-		return EBUSY;
-	free(b->release_threads);
-	free(b->mutex);
-	free(b->next_wait);
-	b = NULL;
-	pthread_mutex_unlock(b->mutex);
+	pthread_cond_destroy(barrier->release_threads);
+	pthread_cond_destroy(barrier->next_bar);
+	pthread_mutex_destroy(barrier->mutex);
+
+	free(barrier->release_threads);
+	free(barrier->next_bar);
+	free(barrier->mutex);
+
+	barrier->release_threads = NULL;
+	barrier->next_bar        = NULL;
+	barrier->mutex           = NULL;
 
 	return EXIT_SUCCESS;
 }
