@@ -5,7 +5,7 @@
  * Developed by George Z. Zachos
  */
 
-#define USE_PTHREAD_BAR
+// #define USE_PTHREAD_BAR
 
 #include <stdio.h>
 #include <stdlib.h>

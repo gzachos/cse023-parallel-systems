@@ -13,15 +13,20 @@
 
 int barrier_init(barrier_t *b, int nthr)
 {
-	if (nthr < 0)
-		return EXIT_FAILURE;
+	int retval;
+
+	if (nthr < 0 || !b)
+		return EINVAL;
+	if (b->mutex)
+		if ((retval = pthread_mutex_init(b->mutex, NULL)) == EBUSY)
+			return EBUSY;
 	b->nthr = b->n = b->spin = nthr;
 
 	b->release_threads = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
 	if (!b->release_threads)
 	{
 		perror("malloc");
-		return errno;
+		return errno; /* =ENOMEM */
 	}
 
 	b->next_wait = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
@@ -29,7 +34,7 @@ int barrier_init(barrier_t *b, int nthr)
 	{
 		free(b->release_threads);
 		perror("malloc");
-		return errno;
+		return errno; /* =ENOMEM */
 	}
 
 	b->mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
@@ -38,7 +43,7 @@ int barrier_init(barrier_t *b, int nthr)
 		free(b->release_threads);
 		free(b->next_wait);
 		perror("malloc");
-		return errno;
+		return errno; /* =ENOMEM */
 	}
 
 	pthread_cond_init(b->release_threads, NULL);
@@ -51,6 +56,11 @@ int barrier_init(barrier_t *b, int nthr)
 
 int barrier_wait(barrier_t *b)
 {
+	if (!b)
+		return EINVAL;
+/*	if (pthread_mutex_init(b->mutex, NULL) != EBUSY)
+		return EINVAL;
+*/
 	pthread_mutex_lock(b->mutex);
 	while (b->spin != b->nthr)
 		pthread_cond_wait(b->next_wait, b->mutex);
@@ -73,11 +83,19 @@ int barrier_wait(barrier_t *b)
 
 int barrier_destroy(barrier_t *b)
 {
+	if (!b)
+		return EINVAL;
+	if (pthread_mutex_init(b->mutex, NULL) != EBUSY)
+		return EINVAL;
+
+	pthread_mutex_lock(b->mutex);
+	if (b->n != b->nthr)
+		return EBUSY;
 	free(b->release_threads);
 	free(b->mutex);
 	free(b->next_wait);
-
 	b = NULL;
+	pthread_mutex_unlock(b->mutex);
 
 	return EXIT_SUCCESS;
 }
