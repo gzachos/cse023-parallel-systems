@@ -6,17 +6,17 @@
  */
 
 #ifndef __GZ_BARRIER
-#define __GZ_BARRIER
+#define __GZ_BARRIER	1
 
 #include <pthread.h>
 
 typedef struct barrier_s {
-	unsigned int     left;
 	unsigned int     init_count;
-	unsigned int     curr_count;
+	unsigned int     arrived;
+	unsigned int     left;
 	pthread_cond_t  *release_threads;
-	pthread_mutex_t *mutex;
 	pthread_cond_t  *next_bar;
+	pthread_mutex_t *mutex;
 } barrier_t;
 
 int barrier_init(barrier_t *barrier, unsigned int nthr);

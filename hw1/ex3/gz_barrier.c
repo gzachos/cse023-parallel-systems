@@ -18,7 +18,8 @@ int barrier_init(barrier_t *barrier, unsigned int count)
 	if (barrier->mutex)
 		if (pthread_mutex_init(barrier->mutex, NULL) == EBUSY)
 			return EBUSY;
-	barrier->init_count = barrier->left = barrier->curr_count = count;
+	barrier->init_count = count;
+	barrier->left = barrier->arrived = 0;
 
 	barrier->release_threads = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
 	if (!barrier->release_threads)
@@ -54,30 +55,32 @@ int barrier_init(barrier_t *barrier, unsigned int count)
 
 int barrier_wait(barrier_t *barrier)
 {
+	unsigned int init_count;
+	int          retval = EXIT_SUCCESS;
+
 	if (!barrier)
 		return EINVAL;
 
 	pthread_mutex_lock(barrier->mutex);
-	while (barrier->curr_count != barrier->init_count)
+	init_count = barrier->init_count;
+	while (barrier->left > 0)
 		pthread_cond_wait(barrier->next_bar, barrier->mutex);
-	(barrier->left)--;
-	while (barrier->left != 0)
+	++(barrier->arrived);
+	while (barrier->arrived != init_count)
 		pthread_cond_wait(barrier->release_threads, barrier->mutex);
-	(barrier->curr_count)--;
-	if (barrier->curr_count == barrier->init_count-1)
+	if ((barrier->left)++ == 0)
 	{
+		retval = PTHREAD_BARRIER_SERIAL_THREAD;
 		pthread_cond_broadcast(barrier->release_threads);
-		pthread_mutex_unlock(barrier->mutex);
-		return PTHREAD_BARRIER_SERIAL_THREAD;
 	}
-	if (barrier->curr_count == 0)
+	if (barrier->left == init_count)
 	{
-		barrier->left = barrier->curr_count = barrier->init_count;
+		barrier->left = barrier->arrived = 0;
 		pthread_cond_broadcast(barrier->next_bar);
 	}
 	pthread_mutex_unlock(barrier->mutex);
 
-	return EXIT_SUCCESS;
+	return retval;
 }
 
 
