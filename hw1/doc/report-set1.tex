@@ -274,7 +274,7 @@ $Y$ axis on a \underline{linear} scale.
     10 & 16 & 10.829372 & 10.820372 & 10.842818 & 10.748566 & 10.810282 \\ [1ex]
     \hline
     \end{tabular}
-  \caption{Timing results of $\pi$ calculation using chunk size = 10 iteration}
+  \caption{Timing results of $\pi$ calculation using chunk size = 10 iterations}
 \end{table}
 
 \begin{figure}[htbp]
@@ -300,13 +300,13 @@ $Y$ axis on a \underline{linear} scale.
     100 & 16 & 2.425184 & 2.459710 & 2.432488 & 2.458897 & 2.44406975 \\ [1ex]
     \hline
     \end{tabular}
-  \caption{Timing results of $\pi$ calculation using chunk size = 100 iteration}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^2$ iterations}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.55\columnwidth]{../ex1/plots/pi_c100.png}
-  \caption{Timing results of $\pi$ calculation using chunk size = 100 iterations}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^2$ iterations}
 \end{figure}
 
 %------------------------------------ 4
@@ -326,13 +326,13 @@ $Y$ axis on a \underline{linear} scale.
     1000 & 16 & 1.731060 & 1.726669 & 1.730891 & 1.732937 & 1.73038925 \\ [1ex]
     \hline
     \end{tabular}
-  \caption{Timing results of $\pi$ calculation using chunk size = 1000 iteration}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^3$ iterations}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.55\columnwidth]{../ex1/plots/pi_c1000.png}
-  \caption{Timing results of $\pi$ calculation using chunk size = 1000 iterations}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^3$ iterations}
 \end{figure}
 
 %------------------------------------ 5
@@ -353,13 +353,13 @@ $Y$ axis on a \underline{linear} scale.
     10000 & 16 & 1.660762 & 1.664066 & 1.661164 & 1.658869 & 1.66121525 \\ [1ex]
     \hline
     \end{tabular}
-  \caption{Timing results of $\pi$ calculation using chunk size = 10000 iteration}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^4$ iterations}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.55\columnwidth]{../ex1/plots/pi_c10000.png}
-  \caption{Timing results of $\pi$ calculation using chunk size = 10000 iterations}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^4$ iterations}
 \end{figure}
 
 %------------------------------------ 6
@@ -380,13 +380,13 @@ $Y$ axis on a \underline{linear} scale.
     100000 & 16 & 1.653965 & 1.652250 & 1.651300 & 1.651015 & 1.6521325 \\ [1ex]
     \hline
     \end{tabular}
-  \caption{Timing results of $\pi$ calculation using chunk size = 100000 iteration}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^5$ iterations}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.55\columnwidth]{../ex1/plots/pi_c100000.png}
-  \caption{Timing results of $\pi$ calculation using chunk size = 100000 iterations}
+  \caption{Timing results of $\pi$ calculation using chunk size = $10^5$ iterations}
 \end{figure}
 
 %------------------------------------
@@ -431,10 +431,11 @@ This exercise is about the multiplication of integer $N$x$N$ arrays using \textt
 and static scheduling. During static scheduling the parallelizable loops are evenly (when
 possible) divided into chunks of iterations (tasks) and are dispatched to the threads available
 to the runtime system for execution. Due to this even distribution of iterations and in contrast
-to dynamic scheduling, a thread executing on a processor under heavy workload will increase the
-total execution time. The purpose of this exercise is to parallelize only the \underline{outermost}
-for-loop of the serial calculation, time the matrix multiplication and observe how altering the
-number of threads will affect execution time.
+to dynamic scheduling, a thread executing on a processor under heavy workload will have a lower
+throughput capability and will lead to an increase of the total execution time. The purpose of
+this exercise is to parallelize only the \underline{outermost} for-loop of the serial calculation,
+time the matrix multiplication and observe how altering the number of threads will affect execution
+time.
 
 \subsection{Implementation details}
 If $T$ is the number of threads, and $N$ is the array dimension, then the outermost
@@ -444,7 +445,7 @@ opposite case, $S=N \bmod T$ threads will be assigned $\lfloor{N/T}\rfloor+1$ it
 and $T-S$ threads will be assigned $\lfloor{N/T}\rfloor$ iterations. We are going
 to refer to $S$ as the number of special threads because these threads execute one
 more iteration than the rest. This policy manages to avoid a lopsided distribution
-of iterations to threads as it increases workload by only a single iteration
+of iterations to threads as it may increase workload by only a single iteration
 \footnote{This additional iteration may add significant delays in coarse-grained
 tasks}.
 
@@ -455,7 +456,7 @@ During this experiment, thread number takes value in \{1, 2, 4, 8, 12, 16\} and 
 size is 1024x1024.
 
 \subsubsection{System Specifications}
-The experiments were conducted once again on a Dell OptiPlex 7020.
+The experiments were conducted again on a Dell OptiPlex 7020.
 
 
 \subsection{Timing Results}
@@ -527,8 +528,9 @@ program is 4,297561 seconds, we conclude that:
 This exercise is about implementing a (simple) custom barrier for a group of \texttt{POSIX}
 threads using only integer data types and \texttt{POSIX} condition variables \footnote{The 
 use of global variables is not allowed}. The purpose of this exercise is to observe how
-altering the number of threads will affect execution time of user programs and how it is
-compared to the execution time while using the \texttt{POSIX} threads' barrier implementation.
+altering the number of threads will affect execution time of user programs using custom
+barrier synchronization and how it is compared to the execution time while using the
+\texttt{POSIX} threads' barrier implementation.
 
 
 \subsection{Experiment details}
@@ -567,7 +569,7 @@ consists of the following members:
         \code{init\_count} threads arrive.
   \item \code{next\_bar} : pthread\_cond\_t \\
         The threads arriving at the barrier, while threads from a previous phase are currently
-        leaving the barrier, block on this condition variable until all \code{init\_count}
+        leaving the barrier, block on this condition variable until all currently blocked
         threads have left and the barrier can be reused.
 \end{itemize}
 
@@ -590,10 +592,11 @@ zero unless one of the following errors occurs:
 \subsubsection{\code{barrier\_destroy()}}
 The \code{barrier\_destroy()} function destroys the barrier referenced by \underline{barrier}
 and releases the resources it currently holds. The implementation of this function is pretty
-straightforward too so I am not going to further explain how it works. Use of the \underline{barrier}
-after calling \code{barrier\_destroy()} is undefined. The results are undefined if this function is
-called when any thread is blocked on the barrier or \underline{barrier} is not initilized.
-Upon successful completion, this function returns zero unless the following error occurs:
+straightforward too so I am not going to further explain how it works either. Use of the
+\underline{barrier} after calling \code{barrier\_destroy()} is undefined. The results are
+undefined if this function is called when any thread is blocked on the barrier or
+\underline{barrier} is not initilized. Upon successful completion, this function returns
+zero unless the following error occurs:
 \begin{itemize}
  \item \code{EINVAL}: The barrier object referenced by \underline{barrier} is \code{NULL}.
 \end{itemize}
@@ -621,7 +624,7 @@ synchronized. Function \code{barrier\_wait()} may fail with the following error:
        condition variable \code{next\_bar}. As soon as it unblocks, it has the mutex lock already
        acquired and proceeds to step \#4 as if this step didn't exist.
  \item The value of member \code{arrived} is incremented.
- \item In case not all \code{init\_count} threads have blocked (arrived) on the barrier, the
+ \item In case not all \code{init\_count} threads have called \code{barrier\_wait()}, the
        encountering thread blocks on barrier's condition variable \code{release\_threads}.
        As soon as it unblocks, it has the mutex lock acquired and proceeds to step \#6.
  \item The first thread that will reach this part of the code is the last thread that
@@ -635,7 +638,7 @@ synchronized. Function \code{barrier\_wait()} may fail with the following error:
  \item If the encountering thread is the \underline{last} one leaving the barrier, it resets
        \code{left} and \code{arrived} members to zero and unblocks any threads blocked on
        \code{next\_bar} condition variable as the barrier is ready for reuse.
- \item The barrier's private mutex is unlocked.
+ \item The barrier's mutex is unlocked.
  \item Zero is returned unless the return value has been set to \code{PTHREAD\_BARRIER\_SERIAL\_THREAD}.
 \end{enumerate}
 
@@ -644,7 +647,7 @@ synchronized. Function \code{barrier\_wait()} may fail with the following error:
 \subsection{Bugs}
 Concurrently calling \code{barrier\_init()} or \code{barrier\_destroy()} has undefined results.
 These two functions should be atomically executed using low level synchronization mechanisms.
-Perhaps Linux Kernel Futexes \footnote{Fast Userspace muTEX-es}.
+Perhaps Linux Kernel Futexes\footnote{Fast Userspace muTEX-es} should do the job.
 
 \newpage 
 
@@ -672,14 +675,14 @@ $Y$ axis on a (base 10) \underline{logarithmic} scale.
     \texttt{POSIX} threads & 0.085 & 1.09525 & 1.84725 & 3.0225 & 16.98425 & 76.451 & 298.4285 & 643.386 \\
     \hline
     \end{tabular}
-  \caption{Timing results of program using barrier-related calls}
+  \caption{Timing results of program using barrier synchronization}
 \end{table}
 
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.55\columnwidth]{../ex3/plots/barrier.png}
-  \caption{Timing results of program using barrier-related calls}
+  \caption{Timing results of program using barrier synchronization}
 \end{figure}
 
 %------------------------------------
@@ -696,10 +699,11 @@ Based on the results presented above we conclude that:
        for the following reasons:
        \begin{enumerate}
          \item The custom barrier implementation is not as optimized as possible because I
-         implemented an algorithm I came up with during this assignment.
+         implemented an algorithm I came up with during this assignment\footnote{To probe further
+         check Sense-Reversing Barriers}.
          \item The custom barrier implementation uses \texttt{POSIX} threads' condition variables
          and a mutex, while the \texttt{POSIX} threads' barrier uses calls to low level synchronization
-         mechanisms found in \code{glibc} library\footnote{For more information refer to \code{lowlevellock.h}.}
+         mechanisms found in \code{glibc} library\footnote{For more information refer to \code{lowlevellock.h}}.
        \end{enumerate}
 \end{itemize}
 

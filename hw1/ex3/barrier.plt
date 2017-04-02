@@ -15,5 +15,5 @@ set ylabel "Time (msec)"
 set y2tics
 set grid
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
-plot './data/barrier.dat' using 1:2 title 'GZ Barrier' with linespoints ls 1, \
+plot './data/barrier.dat' using 1:2 title 'Custom Barrier' with linespoints ls 1, \
      './data/barrier.dat' using 1:3 title 'Pthread Barrier' with linespoints ls 6
