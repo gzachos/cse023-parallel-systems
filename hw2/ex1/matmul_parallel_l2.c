@@ -1,7 +1,7 @@
 /* matmul_parallel_l2.c
  * --------------------
  * Parallel program for matrix-matrix product.
- * Parallelized outermost for loop using OpenMP.
+ * Parallelized innermost for loop using OpenMP.
  *
  * Developed by George Z. Zachos
  * based on matmul_serial.c by VVD.
