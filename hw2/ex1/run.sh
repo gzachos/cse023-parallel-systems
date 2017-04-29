@@ -8,11 +8,6 @@ then
 	mkdir data
 fi
 
-if [ ! -d "./plots/" ]
-then
-	mkdir plots
-fi
-
 echo -e "START\n"
 
 export OMP_DYNAMIC="false"

@@ -12,6 +12,7 @@ set key inside top left reverse vertical Left noenhanced box linetype -1 linewid
 set xlabel "Parallelized Loop"
 set ylabel "Time (sec)"
 set y2tics
+set xtics 1
 set grid
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
 plot './data/matmul.dat' using 2 title 'Static Scheduling' with linespoints ls 1, \
