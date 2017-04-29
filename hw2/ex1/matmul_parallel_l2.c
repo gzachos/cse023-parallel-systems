@@ -1,5 +1,5 @@
-/* matmul_parallel_l0.c
- * -----------------
+/* matmul_parallel_l2.c
+ * --------------------
  * Parallel program for matrix-matrix product.
  * Parallelized outermost for loop using OpenMP.
  *
@@ -31,11 +31,11 @@ int readmat(char *fname, int *mat, int n),
 int main(int argc, char **argv)
 {
 	int        i, j, k, sum;
-    double     elapsed_time;
-    char      *sched_policy;
-    timeval_t  tv1, tv2;
+	double     elapsed_time;
+	char      *sched_policy;
+	timeval_t  tv1, tv2;
 
-    /* The number of threads is provided as a command line argument */
+	/* The number of threads is provided as a command line argument */
 	if (argc < 2)
 	{
 		fprintf(stderr, "Invalid number of command-line arguments!\n");
@@ -43,20 +43,20 @@ int main(int argc, char **argv)
 	}
 
 	sched_policy = strdup(argv[1]);
-    if (!sched_policy)
+	if (!sched_policy)
 	{
 		perror("strdup");
 		exit(errno);
 	}
 
-    if (strncmp(sched_policy, "dynamic", 7) == 0)
-        omp_set_schedule(omp_sched_dynamic, -1);
-    else if (strncmp(sched_policy, "static", 6) == 0)
-        omp_set_schedule(omp_sched_static, -1);
-    else {
-        fprintf(stderr, "Invalid sched policy: %s\n", sched_policy);
+	if (strncmp(sched_policy, "dynamic", 7) == 0)
+		omp_set_schedule(omp_sched_dynamic, -1);
+	else if (strncmp(sched_policy, "static", 6) == 0)
+		omp_set_schedule(omp_sched_static, -1);
+	else {
+		fprintf(stderr, "Invalid sched policy: %s\n", sched_policy);
 		exit(EXIT_FAILURE);
-    }
+	}
 
 	/* Read matrices from files: "A_file", "B_file" */
 	if (readmat("Amat1024", (int *) A, N) < 0)
@@ -64,26 +64,27 @@ int main(int argc, char **argv)
 	if (readmat("Bmat1024", (int *) B, N) < 0)
 		exit( 1 + printf("file problem\n") );
 
-    /* Start timing */
+	/* Start timing */
 	gettimeofday(&tv1, NULL);
 	for (i = 0; i < N; i++)
 		for (j = 0; j < N; j++)
 		{
-            sum = 0;
-            #pragma omp parallel for firstprivate(i,j) \
-                        reduction(+:sum) num_threads(4)
-                for (k = 0; k < N; k++)
-                    sum += A[i][k]*B[k][j];
+			sum = 0;
+			#pragma omp parallel for firstprivate(i,j)    \
+			           reduction(+:sum) schedule(runtime) \
+			           num_threads(4)
+				for (k = 0; k < N; k++)
+					sum += A[i][k]*B[k][j];
 			C[i][j] = sum;
 		};
-    /* End timing */
+	/* End timing */
 	gettimeofday(&tv2, NULL);
 
-    elapsed_time =  (tv2.tv_sec - tv1.tv_sec) +
+	elapsed_time =  (tv2.tv_sec - tv1.tv_sec) +
 	                (tv2.tv_usec - tv1.tv_usec)*1.0E-6;
 
-    printf("Loop #0:\tschedule: %s\ttime: %lf sec.\n", sched_policy,
-            elapsed_time);
+	printf("Loop #2:\tschedule: %s\ttime: %lf sec.\n", sched_policy,
+	        elapsed_time);
 
 	/* Save result in "Cmat1024" */
 	writemat("Cmat1024", (int *) C, N);
