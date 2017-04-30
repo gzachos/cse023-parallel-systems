@@ -12,15 +12,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/time.h>
 
 #define N       1024 /* Array dimension */
 #define NTHR    4    /* # of threads */
 
 /* Global declarations and definitions */
 int A[N][N], B[N][N], C[N][N];
-
-typedef struct timeval timeval_t;
 
 
 /* Function prototypes */
@@ -31,9 +28,8 @@ int readmat(char *fname, int *mat, int n),
 int main(int argc, char **argv)
 {
 	int        i, j, k, sum;
-	double     elapsed_time;
+	double     start_time, elapsed_time;
 	char      *sched_policy;
-	timeval_t  tv1, tv2;
 
 	/* The number of threads is provided as a command line argument */
 	if (argc < 2)
@@ -65,7 +61,7 @@ int main(int argc, char **argv)
 		exit( 1 + printf("file problem\n") );
 
 	/* Start timing */
-	gettimeofday(&tv1, NULL);
+	start_time = omp_get_wtime();
 	#pragma omp parallel for private(j,k,sum) schedule(runtime) \
 	                                              num_threads(4)
 		for (i = 0; i < N; i++)
@@ -76,10 +72,7 @@ int main(int argc, char **argv)
 				C[i][j] = sum;
 			};
 	/* End timing */
-	gettimeofday(&tv2, NULL);
-
-	elapsed_time =  (tv2.tv_sec - tv1.tv_sec) +
-	                (tv2.tv_usec - tv1.tv_usec)*1.0E-6;
+	elapsed_time = omp_get_wtime() - start_time;
 
 	printf("Loop #0:\tschedule: %s\ttime: %lf sec.\n", sched_policy,
 		elapsed_time);
