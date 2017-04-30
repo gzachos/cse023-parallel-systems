@@ -163,7 +163,7 @@
 }
 
 \author{\textbf{\hmwkAuthorName}}
-\date{April 30, 2017} % Insert date here if you want it to appear below your name
+\date{May 1, 2017} % Insert date here if you want it to appear below your name
 
 %----------------------------------------------------------------------------------------
 
@@ -378,196 +378,71 @@ program is 3,82147025 seconds, we conclude that:
 %        switching, thread affinity, cache misses \& cache pollution justify the existence of
 %        these overheads and consequently this behavior.
 % \end{itemize}
-% 
-% %+----------------------------------------------------------+
-% %|                                                          |
-% %|          EXERCISE #3                                     |
-% %|                                                          |
-% %+----------------------------------------------------------+
-% 
-% \section{Exercise \#3}
-% 
-% \subsection{About}
-% This exercise is about implementing a (simple) custom barrier for a group of \texttt{POSIX}
-% threads using only integer data types and \texttt{POSIX} condition variables \footnote{The 
-% use of global variables is not allowed}. The purpose of this exercise is to observe how
-% altering the number of threads will affect execution time of user programs using custom
-% barrier synchronization and how it is compared to the execution time while using the
-% \texttt{POSIX} threads' barrier implementation.
-% 
-% 
-% \subsection{Experiment details}
-% During this experiment, thread number takes value in \{1, 2, 4, 8, 32, 128, 512, 1024\}.
-% 
-% \subsubsection{System Specifications}
-% The experiments were conducted once again on a Dell OptiPlex 7020.
-% 
-% \subsection{Implementation Details}
-% Implementing the barrier synchronization mechanism required definition of struct
-% \code{barrier\_s} and of the following three functions:
-% 
-% \begin{verbatim}
-%  int barrier_init(barrier_t *barrier, unsigned int nthr);
-%  int barrier_wait(barrier_t *barrier);
-%  int barrier_destroy(barrier_t *barrier);
-% \end{verbatim}
-% 
-% \cscript{code/barrier_s}{Struct \code{barrier\_s}}
-% 
-% \subsubsection{Struct \code{barrier\_s}}
-% Struct \code{barrier\_s} contains all the info required to implement the custom barrier and
-% consists of the following members:
-% \begin{itemize}
-%   \item \code{init\_count} : unsigned int \\
-%         The number of threads that must call \code{barrier\_wait()} before any of them
-%         return to the caller.
-%   \item \code{arrived} : unsigned int \\
-%         The number of threads that have arrived to the barrier; Have called \code{barrier\_wait()}
-%         and are currently blocked.
-%   \item \code{left} : unsigned int \\
-%         The number of threads that have left the barrier; Returned from the \code{barrier\_wait()}
-%         call.
-%   \item \code{release\_threads} : pthread\_cond\_t \\
-%         The threads arriving at the barrier block on this condition variable until all
-%         \code{init\_count} threads arrive.
-%   \item \code{next\_bar} : pthread\_cond\_t \\
-%         The threads arriving at the barrier, while threads from a previous phase are currently
-%         leaving the barrier, block on this condition variable until all currently blocked
-%         threads have left and the barrier can be reused.
-% \end{itemize}
-% 
-% \subsubsection{\code{barrier\_init()}}
-% The \code{barrier\_init()} function allocates the resources required to use the barrier
-% referenced by \underline{barrier} and initializes them as needed. The implementation of
-% this function is pretty straightforward so I am not going to further explain how it works.
-% The results are undefined if this function is called when any thread is blocked on the
-% barrier or \underline{barrier} is not initilized. If \code{barrier\_init()} function fails,
-% the contents of the barrier are undefined. Upon successful completion, this function returns
-% zero unless one of the following errors occurs:
-% \begin{itemize}
-%  \item \code{EINVAL}: The value specified by \underline{count} is equal to zero or
-%        \underline{barrier} is \code{NULL}.
-%  \item \code{ENOMEM}: Insufficient memory exists to initialize the barrier.
-%  \item \code{EBUSY}: If the implementation detects that the \underline{barrier} argument
-%        refers to an already initialized barrier object.
-% \end{itemize}
-% 
-% \subsubsection{\code{barrier\_destroy()}}
-% The \code{barrier\_destroy()} function destroys the barrier referenced by \underline{barrier}
-% and releases the resources it currently holds. The implementation of this function is pretty
-% straightforward too so I am not going to further explain how it works either. Use of the
-% \underline{barrier} after calling \code{barrier\_destroy()} is undefined. The results are
-% undefined if this function is called when any thread is blocked on the barrier or
-% \underline{barrier} is not initilized. Upon successful completion, this function returns
-% zero unless the following error occurs:
-% \begin{itemize}
-%  \item \code{EINVAL}: The barrier object referenced by \underline{barrier} is \code{NULL}.
-% \end{itemize}
-% 
-% \subsubsection{\code{barrier\_wait()}}
-% The \code{barrier\_wait()} function synchronizes participating threads at the barrier referenced
-% by \underline{barrier}. The calling thread blocks until \code{init\_count}\footnote{Has the same
-% value as \code{count}, specified during \code{barrier\_init()} call.} threads have called 
-% \code{barrier\_wait()} specifying the very same barrier object. When the required number of
-% threads have arrived at the barrier, all threads are unblocked and the \underline{barrier}
-% is reset for future usage. The results are undefined if this function is called with an
-% uninitialized barrier. Upon successful completion, this function returns
-% \code{PTHREAD\_BARRIER\_SERIAL\_THREAD} \footnote{Constant defined in \code{pthread.h}}
-% to a single arbitrary thread synchronized to the barrier and zero to the remaining threads
-% synchronized. Function \code{barrier\_wait()} may fail with the following error:
-% \begin{itemize}
-%  \item \code{EINVAL}: The barrier object referenced by \underline{barrier} is \code{NULL}.
-% \end{itemize}
-% 
-% \hspace{-0.6cm} The \code{barrier\_wait(barrier\_t *barrier)} function works as follows:
-% \begin{enumerate}
-%  \item If \underline{barrier} argument is \code{NULL}, \code{EINVAL} is returned.
-%  \item The barrier's mutex is locked to ensure that the encountering thread is the only thread around.
-%  \item In case there are threads exiting the barrier, the encountering thread blocks on barrier's
-%        condition variable \code{next\_bar}. As soon as it unblocks, it has the mutex lock already
-%        acquired and proceeds to step \#4 as if this step didn't exist.
-%  \item The value of member \code{arrived} is incremented.
-%  \item In case not all \code{init\_count} threads have called \code{barrier\_wait()}, the
-%        encountering thread blocks on barrier's condition variable \code{release\_threads}.
-%        As soon as it unblocks, it has the mutex lock acquired and proceeds to step \#6.
-%  \item The first thread that will reach this part of the code is the last thread that
-%        called \code{barrier\_wait()}. This happens because only that thead will not block
-%        on condition variable \code{release\_threads} and will later signal the rest
-%        \code{init\_count}$-1$ threads.
-%  \item The value of member \code{left} is incremented.
-%  \item If the encountering thread is the \underline{first} leaving the barrier, it unblocks all
-%        threads blocked on \\ \code{release\_threads} condition variable and the function's
-%        return value is set to\\ \code{PTHREAD\_BARRIER\_SERIAL\_THREAD}.
-%  \item If the encountering thread is the \underline{last} one leaving the barrier, it resets
-%        \code{left} and \code{arrived} members to zero and unblocks any threads blocked on
-%        \code{next\_bar} condition variable as the barrier is ready for reuse.
-%  \item The barrier's mutex is unlocked.
-%  \item Zero is returned unless the return value has been set to \code{PTHREAD\_BARRIER\_SERIAL\_THREAD}.
-% \end{enumerate}
-% 
-% \hspace{-0.6cm} As you may have observed, the above implementation avoids deadlocks.
-% 
-% \subsection{Bugs}
-% Concurrently calling \code{barrier\_init()} or \code{barrier\_destroy()} has undefined results.
-% These two functions should be atomically executed using low level synchronization mechanisms.
-% Perhaps Linux Kernel Futexes\footnote{Fast Userspace muTEX-es} should do the job.
-% 
-% \newpage 
-% 
-% \subsection{Timing Results}
-% In the following table and plot the recorded execution times are displayed.
-% Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
-% $Y$ axis on a (base 10) \underline{logarithmic} scale.
-% 
-% %------------------------------------ 1
-% 
-% \begin{table}[htbp]
-%   \centering
-%     \begin{tabular}{|c||l|l|l|l|l|l|l|l|} 
-%     \hline
-%     \multicolumn{9}{|c|}{Timing results of program execution (Time unit: miliseconds)} \\
-%     \hline
-%     & \multicolumn{8}{|c|}{\# of threads} \\
-%     \hline
-%     Barrier Implemetation  & \multicolumn{1}{|c|}{1} & \multicolumn{1}{|c|}{2} & \multicolumn{1}{|c|}{4} &
-%     \multicolumn{1}{|c|}{8} & \multicolumn{1}{|c|}{32} & \multicolumn{1}{|c|}{128} & \multicolumn{1}{|c|}{512} & 
-%     \multicolumn{1}{|c|}{1024}\\
-%     \hline\hline
-%     Custom & 0.125 & 0.69325 & 1.56775 & 3.952 & 30.27725 & 119.7172 & 431.333 & 950.200 \\
-%     \hline
-%     \texttt{POSIX} threads & 0.085 & 1.09525 & 1.84725 & 3.0225 & 16.98425 & 76.451 & 298.4285 & 643.386 \\
-%     \hline
-%     \end{tabular}
-%   \caption{Timing results of program using barrier synchronization}
-% \end{table}
-% 
-% 
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=0.55\columnwidth]{../ex3/plots/barrier.png}
-%   \caption{Timing results of program using barrier synchronization}
-% \end{figure}
-% 
-% %------------------------------------
-% 
-% 
-% \subsection{Conclusion}
-% Based on the results presented above we conclude that:
-% 
-% \begin{itemize}
-%  \item User program execution time has a near exponential growth relative to the number of
-%        threads synchronized by the barrier. This is observed for both the custom and the
-%        \texttt{POSIX} barrier implementation.
-%  \item The custom barrier implementation results in higher execution times. This happens
-%        for the following reasons:
-%        \begin{enumerate}
-%          \item The custom barrier implementation is not as optimized as possible because I
-%          implemented an algorithm I came up with during this assignment\footnote{To probe further
-%          check Sense-Reversing Barriers}.
-%          \item The custom barrier implementation uses \texttt{POSIX} threads' condition variables
-%          and a mutex, while the \texttt{POSIX} threads' barrier uses calls to low level synchronization
-%          mechanisms found in \code{glibc} library\footnote{For more information refer to \code{lowlevellock.h}}.
-%        \end{enumerate}
-% \end{itemize}
+
+
+%+----------------------------------------------------------+
+%|                                                          |
+%|          EXERCISE #3                                     |
+%|                                                          |
+%+----------------------------------------------------------+
+
+\section{Exercise \#3}
+
+\subsection{About}
+This exercise is about the multiplication of integer $N$x$N$ arrays using \texttt{OpenMP} tasks
+and checkerboard partitioning. During checkerboard partitioning, the initial matrix is divided
+into submatrices of size $S$x$S$. The purpose of this exercise is to assign the calculation
+of each submatrix to an \texttt{OpenMP} task and observe how altering the number of tasks
+will affect execution time.
+
+\subsection{Experiment details}
+During this experiment, the number of \texttt{OpenMP} tasks takes value in \{16, 256, 1024\},
+initial array size is 1024x1024 and the number of threads used in \code{parallel} regions is
+four (4).
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{|c||l|l|l|l||l|} 
+    \hline
+    \multicolumn{6}{|c|}{Timing results of matrix multiplication (Time unit: seconds)} \\
+    \multicolumn{6}{|c|}{Array size: 1024x1024} \\
+    \hline
+   \# of \texttt{OpenMP} Tasks & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
+    \hline\hline
+    16 & 0.798303 & 0.790874 & 1.156564 & 0.901301 & 0.9117605 \\ 
+    \hline
+    256 & 1.003373 & 0.993386 & 0.863506 & 0.974971 & 0.958809 \\
+    \hline
+    1024 & 1.191109 & 1.036035 & 1.138259 & 0.956815 & 1.0805545 \\ [1ex]
+    \hline
+    \end{tabular}
+  \caption{Timing results of 2D matrix multiplication using \texttt{OpenMP}
+           tasks and checkerboard partitioning}
+\end{table}
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.55\columnwidth]{../ex3/plots/matmul.png}
+  \caption{Timing results of 2D matrix multiplication using \texttt{OpenMP}
+           tasks and checkerboard partitioning}
+\end{figure}
+
+
+\subsection{Conclusion}
+Based on the results presented above and given that the average execution time of the serial
+program is 3,82147025 seconds, we conclude that:
+
+\begin{itemize}
+ \item Program performance is decreased as the number of \texttt{OpenMP} tasks is increased.
+       This happens due to the overheads related to task management (creation,
+       task switching etc.).
+ \item Even though overheads related to task management are introduced, execution time remains
+       significantly lower compared to the one of the serial program. This is because
+       the significant synchronization overheads\footnote{As observed in Exercise \#1.}
+       do not increase relatively to the task number. Actually no syncrhonization takes 
+       place at all except for the implicit barrier at the end of the \code{parallel}
+       region.
+\end{itemize}
 
 \end{document}
