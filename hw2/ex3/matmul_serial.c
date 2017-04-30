@@ -3,6 +3,7 @@
  * VVD
  */
 
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +15,7 @@ int readmat(char *fname, int *mat, int n),
 int main()
 {
 	int i, j, k, sum;
+	double start_time, elapsed_time;
 
 	/* Read matrices from files: "A_file", "B_file" 
 	 */
@@ -22,6 +24,8 @@ int main()
 	if (readmat("Bmat1024", (int *) B, N) < 0) 
 		exit( 1 + printf("file problem\n") );
 
+	/* Start timing */
+	start_time = omp_get_wtime();
 	for (i = 0; i < N; i++)
 		for (j = 0; j < N; j++)
 		{
@@ -29,6 +33,10 @@ int main()
 				sum += A[i][k]*B[k][j];
 			C[i][j] = sum;
 		};
+	/* End timing */
+	elapsed_time = omp_get_wtime() - start_time;
+
+	printf("time: %lf sec.\n", elapsed_time);
 
 	/* Save result in "Cmat1024"
 	 */
