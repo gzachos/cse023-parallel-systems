@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	         x, y;     /* Submatrix coordinates */
 	double   start_time, elapsed_time;
 
-	/* The number of threads is provided as a command line argument */
+	/* The number of OpenMP tasks is provided as a command line argument */
 	if (argc < 2)
 	{
 		fprintf(stderr, "Invalid number of command-line arguments!\n");

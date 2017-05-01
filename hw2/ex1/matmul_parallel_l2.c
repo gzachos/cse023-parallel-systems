@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	double     start_time, elapsed_time;
 	char      *sched_policy;
 
-	/* The number of threads is provided as a command line argument */
+	/* The schedule is provided as a command line argument */
 	if (argc < 2)
 	{
 		fprintf(stderr, "Invalid number of command-line arguments!\n");
@@ -66,9 +66,9 @@ int main(int argc, char **argv)
 		for (j = 0; j < N; j++)
 		{
 			sum = 0;
-			#pragma omp parallel for firstprivate(i,j)    \
-			           reduction(+:sum) schedule(runtime) \
-			           num_threads(4)
+			#pragma omp parallel for firstprivate(i,j)     \
+			            reduction(+:sum) schedule(runtime) \
+			            num_threads(NTHR)
 				for (k = 0; k < N; k++)
 					sum += A[i][k]*B[k][j];
 			C[i][j] = sum;

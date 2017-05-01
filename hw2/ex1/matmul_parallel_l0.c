@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	double     start_time, elapsed_time;
 	char      *sched_policy;
 
-	/* The number of threads is provided as a command line argument */
+	/* The schedule is provided as a command line argument */
 	if (argc < 2)
 	{
 		fprintf(stderr, "Invalid number of command-line arguments!\n");
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	/* Start timing */
 	start_time = omp_get_wtime();
 	#pragma omp parallel for private(j,k,sum) schedule(runtime) \
-	                                              num_threads(4)
+	                                          num_threads(NTHR)
 		for (i = 0; i < N; i++)
 			for (j = 0; j < N; j++)
 			{

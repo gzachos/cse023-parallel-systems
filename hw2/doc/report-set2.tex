@@ -144,7 +144,7 @@
 %----------------------------------------------------------------------------------------
 
 \newcommand{\hmwkTitle}{Homework \#2} % Assignment title
-\newcommand{\hmwkDueDate}{Monday,\ May\ 1,\ 2017} % Due date
+\newcommand{\hmwkDueDate}{Monday,\ May\ 2,\ 2017} % Due date
 \newcommand{\hmwkClass}{MYE023} % Course/class
 \newcommand{\hmwkClassTime}{} % Class/lecture time
 \newcommand{\hmwkClassInstructor}{Vassilios V. Dimakopoulos} % Teacher/lecturer
@@ -262,13 +262,13 @@ program is 3,82147025 seconds, we conclude that:
 
 \begin{itemize}
  \item The best program performance\footnote{About 86\% speedup.} is achieved by
-       parallelizing the outermost for-loop as only one parallel region is invoked.
-       Parallelizing the middle and the innermost loop will cause $N$ and $N^2$
-       invocations respectively and the granularity of the tasks being dispatched to
-       the team threads to decrease. Due to these continuous invocations, execution
-       time is increased as overheads are introduced by thread management (creation, 
-       synchronization\footnote{There is an implied barrier at the end of every
-       \code{parallel} region.}, destruction etc.).
+       parallelizing the outermost for-loop as only one parallel region is encountered.
+       Parallelizing the middle and the innermost loop will cause $N$ and $N^2$ region
+       encounters respectively and the granularity of the tasks being dispatched to
+       the team threads to decrease. Due to these continuous \code{parallel} region
+       encounters, execution time is increased as overheads are introduced by thread
+       management (creation, synchronization\footnote{There is an implied barrier at
+       the end of every \code{parallel} region.}, destruction etc.).
  \item Both \code{dynamic} and \code{static} schedules result in approximately the
        same execution time, except for the case of parallelizing the innermost 
        for-loop. During \code{static} schedule, the iteration space is divided
