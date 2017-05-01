@@ -276,7 +276,7 @@ program is 3,82147025 seconds, we conclude that:
        is distributed to each thread. In constrast, during \code{dynamic} schedule,
        default chunk size equals to one iteration and in total $N^3$ dispatches
        take place\footnote{$N$ dispatches every time the \code{parallel} construct
-       is encountered}. For this reason, \code{dynamic} schedule exponentially
+       is encountered.}. For this reason, \code{dynamic} schedule exponentially
        increases program time.
 \end{itemize}
 
@@ -400,6 +400,14 @@ During this experiment, the number of \texttt{OpenMP} tasks takes value in \{16,
 initial array size is 1024x1024 and the number of threads used in \code{parallel} regions is
 four (4).
 
+\subsubsection{System Specifications}
+The experiments were conducted again on a Dell OptiPlex 7020.
+
+\subsection{Timing Results}
+In the following table and plot the recorded execution times are displayed.
+Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
+$Y$ axis on a \underline{linear} scale.
+
 \begin{table}[htbp]
   \centering
     \begin{tabular}{|c||l|l|l|l||l|} 
@@ -439,10 +447,11 @@ program is 3,82147025 seconds, we conclude that:
        task switching etc.).
  \item Even though overheads related to task management are introduced, execution time remains
        significantly lower compared to the one of the serial program. This is because
-       the significant synchronization overheads\footnote{As observed in Exercise \#1.}
-       do not increase relatively to the task number. Actually no syncrhonization takes 
-       place at all except for the implicit barrier at the end of the \code{parallel}
-       region.
+       the significant synchronization overheads\footnote{As observed in Exercise \#1 where
+       the increase of \code{parallel} region encounters results in a linear increase of
+       the number of implicit barriers.} do not increase relatively to the task number.
+       Actually no syncrhonization takes place at all except for the implicit barrier
+       at the end of the \code{parallel} region.
 \end{itemize}
 
 \end{document}
