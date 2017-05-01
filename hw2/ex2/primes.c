@@ -1,8 +1,10 @@
-#include <stdio.h>
 #include <omp.h>
+#include <stdio.h>
 
 #define UPTO 10000000
 
+
+/* Global declarations and definitions */
 long int count,      /* number of primes */
          lastprime;  /* the last prime found */
 
@@ -18,11 +20,11 @@ void serial_primes(long int n) {
 		num = 2*i + 3;
 
 		divisor = 1;
-		do 
+		do
 		{
 			divisor += 2;                  /* Divide by the next odd */
-			quotient  = num / divisor;  
-			remainder = num % divisor;  
+			quotient  = num / divisor;
+			remainder = num % divisor;
 		} while (remainder && divisor <= quotient);  /* Don't go past sqrt */
 
 		if (remainder || divisor == num) /* num is prime */
@@ -38,26 +40,60 @@ void openmp_primes(long int n) {
 	long int i, num, divisor, quotient, remainder;
 
 	if (n < 2) return;
-	count = 1;                         /* 2 is the first prime */
+	count = 1;
 	lastprime = 2;
 
-	/* 
-	 * Parallelize the serial algorithm but you are NOT allowed to change it!
-	 * Don't add/remove/change global variables
-	 */
+
+	/* Scheduling policy controlled via OMP_SCHEDULE e.v. */
+	#pragma omp parallel for private(num,divisor,quotient,remainder) \
+	                                               schedule(runtime)
+	{
+		for (i = 0; i < (n-1)/2; ++i) {
+			num = 2*i + 3;
+
+			divisor = 1;
+			do
+			{
+				divisor += 2;
+				quotient  = num / divisor;
+				remainder = num % divisor;
+			} while (remainder && divisor <= quotient);
+
+			if (remainder || divisor == num)
+			{
+				#pragma omp critical
+				{
+					count++;
+					lastprime = num;
+				}
+			}
+		}
+	}
+
 }
 
 
-int main()
+int main(void)
 {
+	double   start_time, elapsed_time;
+
 	printf("Serial and parallel prime number calculations:\n\n");
-	
-	/* Time the following to compare performance 
-	 */
-	serial_primes(UPTO);        /* time it */
-	printf("[serial] count = %ld, last = %ld (time = ...)\n", count, lastprime);
-	openmp_primes(UPTO);        /* time it */
-	printf("[openmp] count = %ld, last = %ld (time = ...)\n", count, lastprime);
-	
+
+	/* Start timing */
+	start_time = omp_get_wtime();
+	serial_primes(UPTO);
+	/* End timing */
+	elapsed_time = omp_get_wtime() - start_time;
+	printf("[serial] count = %ld, last = %ld (time = %f)\n",
+		count, lastprime, elapsed_time);
+
+	/* Start timing */
+	start_time = omp_get_wtime();
+	openmp_primes(UPTO);
+	/* End timing */
+	elapsed_time = omp_get_wtime() - start_time;
+	printf("[openmp] count = %ld, last = %ld (time = %f)\n",
+		count, lastprime, elapsed_time);
+
 	return 0;
 }
