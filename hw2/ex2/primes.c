@@ -46,8 +46,8 @@ void openmp_primes(long int n) {
 
 	/* Scheduling policy controlled via OMP_SCHEDULE e.v. */
 	#pragma omp parallel for private(num,divisor,quotient,remainder) \
-	                                               schedule(runtime)
-	{
+	                     reduction(max:lastprime) reduction(+:count) \
+	                     schedule(runtime)
 		for (i = 0; i < (n-1)/2; ++i) {
 			num = 2*i + 3;
 
@@ -61,14 +61,10 @@ void openmp_primes(long int n) {
 
 			if (remainder || divisor == num)
 			{
-				#pragma omp critical
-				{
-					count++;
-					lastprime = num;
-				}
+				count++;
+				lastprime = num;
 			}
 		}
-	}
 
 }
 
@@ -77,8 +73,8 @@ int main(void)
 {
 	double   start_time, elapsed_time;
 
-	printf("Serial and parallel prime number calculations:\n\n");
-
+//	printf("Serial and parallel prime number calculations:\n");
+#if 0
 	/* Start timing */
 	start_time = omp_get_wtime();
 	serial_primes(UPTO);
@@ -86,13 +82,13 @@ int main(void)
 	elapsed_time = omp_get_wtime() - start_time;
 	printf("[serial] count = %ld, last = %ld (time = %f)\n",
 		count, lastprime, elapsed_time);
-
+#endif
 	/* Start timing */
 	start_time = omp_get_wtime();
 	openmp_primes(UPTO);
 	/* End timing */
 	elapsed_time = omp_get_wtime() - start_time;
-	printf("[openmp] count = %ld, last = %ld (time = %f)\n",
+	printf("[openmp] count = %ld, last = %ld ( time = %f )\n",
 		count, lastprime, elapsed_time);
 
 	return 0;
