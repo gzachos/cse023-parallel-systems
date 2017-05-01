@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SCHEDULES="static dynamic guided"
-CHUNK_SIZE="0 10 100 1000 10000 100000"
+CHUNK_SIZE="1 10 100 1000 10000 100000 1000000"
 TMPFILE=`mktemp primes.XXXXXX`
 EXEFILE='primes.out'
 OUTFILE="./data/primes.dat"
