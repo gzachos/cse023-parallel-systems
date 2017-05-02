@@ -163,7 +163,7 @@
 }
 
 \author{\textbf{\hmwkAuthorName}}
-\date{May 1, 2017} % Insert date here if you want it to appear below your name
+\date{May 2, 2017} % Insert date here if you want it to appear below your name
 
 %----------------------------------------------------------------------------------------
 
@@ -231,7 +231,7 @@ a (base 10) \underline{logarithmic} scale.
 
 \begin{table}[htbp]
   \centering
-    \begin{tabular}{|c||l|l|l|l|l|l|l|l|} 
+    \begin{tabular}{|c||l|l|l|} 
     \hline
     \multicolumn{4}{|c|}{Timing results of matrix multiplication (Time unit: seconds)} \\
     \multicolumn{4}{|c|}{Array size: 1024x1024, Number of threads: 4} \\
@@ -281,103 +281,86 @@ program is 3,82147025 seconds, we conclude that:
 \end{itemize}
 
 
-% %+----------------------------------------------------------+
-% %|                                                          |
-% %|          EXERCISE #2                                     |
-% %|                                                          |
-% %+----------------------------------------------------------+
-% 
-% \section{Exercise \#2}
-% 
-% \subsection{About}
-% This exercise is about the multiplication of integer $N$x$N$ arrays using \texttt{POSIX} threads
-% and static scheduling. During static scheduling the parallelizable loops are evenly (when
-% possible) divided into chunks of iterations (tasks) and are dispatched to the threads available
-% to the runtime system for execution. Due to this even distribution of iterations and in contrast
-% to dynamic scheduling, a thread executing on a processor under heavy workload will have a lower
-% throughput capability and will lead to an increase of the total execution time. The purpose of
-% this exercise is to parallelize only the \underline{outermost} for-loop of the serial calculation,
-% time the matrix multiplication and observe how altering the number of threads will affect execution
-% time.
-% 
-% \subsection{Implementation details}
-% If $T$ is the number of threads, and $N$ is the array dimension, then the outermost
-% for-loop of the serial program consists of $N$ iterations, that should be divided
-% into $T$ chunks. When $T$ divides $N$ evenly, the exact chunk size is $N/T$. In the
-% opposite case, $S=N \bmod T$ threads will be assigned $\lfloor{N/T}\rfloor+1$ iterations
-% and $T-S$ threads will be assigned $\lfloor{N/T}\rfloor$ iterations. We are going
-% to refer to $S$ as the number of special threads because these threads execute one
-% more iteration than the rest. This policy manages to avoid a lopsided distribution
-% of iterations to threads as it may increase workload by only a single iteration
-% \footnote{This additional iteration may add significant delays in coarse-grained
-% tasks}.
-% 
-% \newpage
-% 
-% \subsection{Experiment details}
+%+----------------------------------------------------------+
+%|                                                          |
+%|          EXERCISE #2                                     |
+%|                                                          |
+%+----------------------------------------------------------+
+
+\section{Exercise \#2}
+
+\subsection{About}
+This exercise is about the parallelization of \code{serial\_primes()} function which given
+a positive number $N$, counts the number of prime numbers and calculates the maximum prime
+found in $(0,N]$. The purpose of this exercise is to use the \code{parallel for} construct
+defined by the \texttt{OpenMP} specification and observe how different scheduling policies
+affect execution time.
+
+\subsection{Experiment details}
 % During this experiment, thread number takes value in \{1, 2, 4, 8, 12, 16\} and array
 % size is 1024x1024.
-% 
-% \subsubsection{System Specifications}
-% The experiments were conducted again on a Dell OptiPlex 7020.
-% 
-% 
-% \subsection{Timing Results}
-% In the following table and plot the recorded execution times are displayed.
-% Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
-% $Y$ axis on a \underline{linear} scale.
-% 
-% %------------------------------------ 1
-% 
-% \begin{table}[htbp]
-%   \centering
-%     \begin{tabular}{|c||l|l|l|l||l|} 
-%     \hline
-%     \multicolumn{6}{|c|}{Timing results of matrix multiplication (Time unit: seconds)} \\
-%     \multicolumn{6}{|c|}{Array size: 1024x1024} \\
-%     \hline
-%    \# of threads & 1st run & 2nd run & 3rd run & 4th run & Average time\\ [0.5ex] 
-%     \hline\hline
-%     1 & 5.057095 & 4.319662 & 3.157559 & 5.297035 & 4.45783775 \\ 
-%     \hline
-%     2 & 2.648351 & 2.545161 & 1.940197 & 2.043663 & 2.294343 \\
-%     \hline
-%     4 & 0.918773 & 0.800195 & 1.504583 & 1.504583 & 1.07884625 \\
-%     \hline
-%     8 & 0.971947 & 1.428921 & 1.224236 & 0.990774 & 1.1539695 \\
-%     \hline
-%     12 & 0.965793 & 0.986273 & 0.981548 & 1.130868 & 1.0161205 \\
-%     \hline
-%     16 & 1.208460 & 1.241845 & 1.015431 & 0.974093 & 1.10995725 \\ [1ex]
-%     \hline
-%     \end{tabular}
-%   \caption{Timing results of 2D matrix multiplication}
-% \end{table}
-% 
-% 
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=0.55\columnwidth]{../ex2/plots/matmul.png}
-%   \caption{Timing results of 2D matrix multiplication}
-% \end{figure}
-% 
-% %------------------------------------
-% \pagebreak
-% 
-% \subsection{Conclusion}
-% Based on the results presented above and given that the average execution time of the serial
-% program is 4,297561 seconds, we conclude that:
-% 
-% \begin{itemize}
-%  \item Program performance is approximately doubled as the number of threads is increased, until
-%        oversubscription bottleneck is hit and execution time becomes almost constant
-%        \footnote{This is also the conclusion we came to on Exercise \#1}.
-%  \item Execution time of the parallel program when a single thread is used to perform the
-%        calculation is a bit higher than the time of the serial program. Moreover, we observed
-%        that execution time in general varies from time to time. Several reasons such as context
-%        switching, thread affinity, cache misses \& cache pollution justify the existence of
-%        these overheads and consequently this behavior.
-% \end{itemize}
+During this experiment, the schedules used are \code{static}, \code{dynamic} and \code{guided}
+while chunk size takes value in \{1, 10, $10^2$, $10^3$, $10^4$, $10^5$, $10^6$\}. The number
+of threads used in \code{parallel} regions is four (4).
+
+\subsubsection{System Specifications}
+The experiments were conducted again on a Dell OptiPlex 7020.
+
+
+\subsection{Timing Results}
+In the following table and plot the recorded execution times are displayed.
+Note that $X$ axis is plotted on a (base 10) \underline{logarithmic} scale while
+$Y$ axis on a \underline{linear} scale.
+
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{|c||l|l|l|l|l|l|l|} 
+    \hline
+    \multicolumn{8}{|c|}{Timing results of primes calculation (Time unit: seconds)} \\
+    \multicolumn{8}{|c|}{Number of threads: 4} \\
+    \hline
+    & \multicolumn{7}{|c|}{Chunk size} \\
+    \hline
+    Scheduling Policy  & \multicolumn{1}{|c|}{1} & \multicolumn{1}{|c|}{10} & \multicolumn{1}{|c|}{$10^2$} 
+    & \multicolumn{1}{|c|}{$10^3$} & \multicolumn{1}{|c|}{$10^4$} & \multicolumn{1}{|c|}{$10^5$} 
+    & \multicolumn{1}{|c|}{$10^6$}\\
+    \hline\hline
+    Static & 3.76737175 & 3.74108125 & 3.73942225 & 3.738404 & 3.747804 & 3.884757 & 5.433113 \\
+    \hline
+    Dynamic & 3.75348175 & 3.73795675 & 3.7347005 & 3.736425 & 3.748476 & 3.88446 & 5.431626 \\
+    \hline
+    Guided &  3.736479 & 3.730526 & 3.7326305 & 3.735151 & 3.749482 & 3.914775 & 5.056508 \\ [1ex]
+    \hline
+    \end{tabular}
+  \caption{Timing results of primes calculation}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.55\columnwidth]{../ex2/plots/primes.png}
+  \caption{Timing results of primes calculation}
+\end{figure}
+
+
+\subsection{Conclusion}
+Based on the results presented above and given that the average execution time of the serial
+program is 13.02629725 seconds, we conclude that:
+
+\begin{itemize}
+  \item All schedules for a given chunk size result in approximately the same execution time.
+        This is due to the negligible workload\footnote{Processor on idle state with some lightweight
+        system services running every once in a while} under which the four system processors were
+        while the experiments were conducted.
+  \item Parallel program efficiency is unfolded for chunk size between $10$ and $10^3$.
+  \item Fine-grained tasks (chunk size: 1) result to a slight increase of program time as overheads
+        are introduced due to the continuous chunk dispatch.
+  \item More coarse-grained tasks (chunk size $> 10^3$) cause a significant increase of program time.
+        This happens because of the nature of the calculation conducted. The time spent in the 
+        \code{while} loop of the calculation is increased as loop counter variable \code{i} is 
+        increased\footnote{In general terms. Not for every single value of \code{i}}. For this
+        reason, dividing iteration space in large chunks, will lead to a lopsided work share
+        between threads and the total execution time will increase.
+\end{itemize}
 
 
 %+----------------------------------------------------------+
@@ -403,14 +386,17 @@ four (4).
 \subsubsection{System Specifications}
 The experiments were conducted again on a Dell OptiPlex 7020.
 
+
 \subsection{Timing Results}
 In the following table and plot the recorded execution times are displayed.
 Note that $X$ axis is plotted on a (base 2) \underline{logarithmic} scale while
 $Y$ axis on a \underline{linear} scale.
 
+\newpage
+
 \begin{table}[htbp]
   \centering
-    \begin{tabular}{|c||l|l|l|l||l|} 
+    \begin{tabular}{|c||l|l|l|l|l|} 
     \hline
     \multicolumn{6}{|c|}{Timing results of matrix multiplication (Time unit: seconds)} \\
     \multicolumn{6}{|c|}{Array size: 1024x1024} \\
