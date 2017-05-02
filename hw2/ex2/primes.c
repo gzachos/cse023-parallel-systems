@@ -1,5 +1,13 @@
+/* primes.c
+ * --------
+ *
+ * Developed by George Z. Zachos
+ * Initial program developed by VVD.
+ */
+
 #include <omp.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define UPTO 10000000
 
@@ -91,5 +99,5 @@ int main(void)
 	printf("[openmp] count = %ld, last = %ld ( time = %f )\n",
 		count, lastprime, elapsed_time);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
