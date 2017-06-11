@@ -89,10 +89,8 @@ int main(int argc, char **argv)
 	time[COMM] = t3 - t0 - time[CALC];
 
 	MPI_Reduce(time, stats,            2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(time, stats + MIN_CALC, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-	MPI_Reduce(time, stats + MIN_COMM, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-	MPI_Reduce(time, stats + MAX_CALC, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-	MPI_Reduce(time, stats + MAX_COMM, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+	MPI_Reduce(time, stats + MIN_CALC, 2, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+	MPI_Reduce(time, stats + MAX_CALC, 2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 	if (myrank == 0)
 	{
@@ -100,13 +98,13 @@ int main(int argc, char **argv)
 		stats[COMM] /= nnodes;
 
 		printf("Time:\n");
-		printf("   Total   : %2f\n", stats[CALC] + stats[COMM]);
-		printf("   Avg Calc: %2f\n", stats[CALC]);
-		printf("   Max Calc: %2f\n", stats[MAX_CALC]);
-		printf("   Min Calc: %2f\n", stats[MIN_CALC]);
-		printf("   Avg Comm: %2f\n", stats[COMM]);
-		printf("   Max Comm: %2f\n", stats[MAX_COMM]);
-		printf("   Min Comm: %2f\n", stats[MIN_COMM]);
+		printf("   Total   : %2lf\n", stats[CALC] + stats[COMM]);
+		printf("   Avg Calc: %2lf\n", stats[CALC]);
+		printf("   Max Calc: %2lf\n", stats[MAX_CALC]);
+		printf("   Min Calc: %2lf\n", stats[MIN_CALC]);
+		printf("   Avg Comm: %2lf\n", stats[COMM]);
+		printf("   Max Comm: %2lf\n", stats[MAX_COMM]);
+		printf("   Min Comm: %2lf\n", stats[MIN_COMM]);
 
 		/* Save result in "Cmat1024" */
 		writemat("Cmat1024", C, N);
