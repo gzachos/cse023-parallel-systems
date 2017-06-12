@@ -1,0 +1,10 @@
+Enter the number of tasks: 
+pi = 3.1415926536
+Time:
+   Total   : 1.983124
+   Avg Calc: 0.027943
+   Max Calc: 0.112937
+   Min Calc: 0.000734
+   Avg Comm: 1.955180
+   Max Comm: 2.098967
+   Min Comm: 0.117128
