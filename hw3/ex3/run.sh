@@ -2,6 +2,7 @@
 
 NODE_NUM="2 4 8"
 EXEFILE="pi_mpi.out"
+INFILE="pi_in.txt"
 
 if [ ! -d "./data/" ]
 then
@@ -11,6 +12,7 @@ fi
 echo -e "START\n"
 
 mpicc pi_mpi.c --output ${EXEFILE}
+echo "10000" > ${INFILE}
 
 for node_num in ${NODE_NUM}
 do
@@ -20,7 +22,7 @@ do
 		echo "Pi calculation using ${node_num} nodes (Run: #${x}):"
 		OUTFILE="./data/pi_n${node_num}_${x}.dat"
 		: > ${OUTFILE}
-		mpirun --hostfile ../nodes-${node_num}.txt -npernode 4 ${EXEFILE} | tee -a ${OUTFILE}
+		mpirun --hostfile ../nodes-${node_num}.txt -npernode 4 ${EXEFILE} < ${INFILE} | tee -a ${OUTFILE}
 		# Verify results
 		PI=`cat ${OUTFILE} | grep pi | awk '{print $3}'`
 		if [ "${PI}" != "3.1415926536" ]
@@ -33,7 +35,7 @@ do
 	done
 	echo -e "\n"
 done
-rm ${EXEFILE}
+rm ${EXEFILE} ${INFILE}
 
 echo "END"
 
