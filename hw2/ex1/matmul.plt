@@ -15,5 +15,7 @@ set y2tics
 set xtics 1
 set grid
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
+set style line 1 lc rgb '#dd181f' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
+set style line 2 lc rgb '#0000ff' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
 plot './data/matmul.dat' using 2 title 'Static Scheduling' with linespoints ls 1, \
-     './data/matmul.dat' using 3 title 'Dynamic Scheduling' with linespoints ls 6
+     './data/matmul.dat' using 3 title 'Dynamic Scheduling' with linespoints ls 2

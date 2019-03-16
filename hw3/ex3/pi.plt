@@ -11,6 +11,7 @@ set ylabel "Time (sec)"
 set logscale y 2
 set grid
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
+set style line 1 lc rgb '#dd181f' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
 plot './data/final.dat' using 1:($3+$6) title 'Comm.' with filledcurves x1 lc rgb "#FF7F50", \
      './data/final.dat' using 1:3 title 'Calc.' with filledcurves x1 lc rgb "#0000CD", \
      './data/final.dat' using 1:2 title 'Total' with linespoints ls 1

@@ -16,6 +16,9 @@ set y2tics
 #set xrange [-1:]
 set grid
 set colorbox vertical origin screen 0.9, 0.2, 0 size screen 0.05, 0.6, 0 front bdefault
-plot './data/primes.dat' using 1:2 title 'Static Scheduling' with linespoints ls 5, \
+set style line 1 lc rgb '#dd181f' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
+set style line 2 lc rgb '#0000ff' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
+set style line 3 lc rgb '#1bc12e' lt 1 lw 1.5 pt 7 pi -1 ps 1.4
+plot './data/primes.dat' using 1:2 title 'Static Scheduling' with linespoints ls 3, \
      './data/primes.dat' using 1:3 title 'Dynamic Scheduling' with linespoints ls 1, \
-     './data/primes.dat' using 1:4 title 'Guided Scheduling' with linespoints ls 6, \
+     './data/primes.dat' using 1:4 title 'Guided Scheduling' with linespoints ls 2, \
